@@ -19,7 +19,7 @@ RUN apt-get update && \
   apt-get install -y --no-install-recommends pwgen krb5-kdc krb5-admin-server krb5-kdc-ldap krb5-k5tls krb5-otp krb5-pkinit krb5-strength && \
   apt-get clean && \
   rm -rf /tmp/* /var/lib/apt/lists/* /var/tmp/ && \
-  adduser --system --no-create-home --uid 1000 --group --home /var/lib/krb5kdc krb5kdc && \
+  adduser --system --no-create-home --uid 1673 --group --home /var/lib/krb5kdc krb5kdc && \
   mkdir -p /var/lib/krb5kdc && \
   rm -rf /var/lib/krb5kdc/* && \
   echo > /etc/krb5.conf && \
@@ -28,7 +28,7 @@ RUN apt-get update && \
 
 COPY ./entrypoint.sh /entrypoint.sh
 
-USER 1000
+USER 1673
 
 WORKDIR /var/lib/krb5kdc
 
