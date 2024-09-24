@@ -3,7 +3,7 @@
 set -xeuo pipefail
 
 if [ -z "$(cat "${KRB5_CONFIG}")" ]; then
-cat <<EOF > "${KRB5_CONFIG}"
+  cat <<EOF >"${KRB5_CONFIG}"
 [libdefaults]
   dns_lookup_realm = false
   ticket_lifetime = 24h
@@ -15,17 +15,17 @@ cat <<EOF > "${KRB5_CONFIG}"
 [realms]
   ${KRB5_REALM} = {
 EOF
-if [ -n "${KRB5_KDC:-}" ]; then
-echo "    kdc = ${KRB5_KDC}" >> /etc/krb5.conf
-fi
-if [ -n "${KRB5_ADMINSERVER:-}" ]; then
-echo "    admin_server = ${KRB5_ADMINSERVER}" >> /etc/krb5.conf
-fi
-echo "  }" >> /etc/krb5.conf
+  if [ -n "${KRB5_KDC:-}" ]; then
+    echo "    kdc = ${KRB5_KDC}" >>/etc/krb5.conf
+  fi
+  if [ -n "${KRB5_ADMINSERVER:-}" ]; then
+    echo "    admin_server = ${KRB5_ADMINSERVER}" >>/etc/krb5.conf
+  fi
+  echo "  }" >>/etc/krb5.conf
 fi
 
 if [ -z "$(cat "${KRB5_KDC_PROFILE}")" ]; then
-cat <<EOF > "${KRB5_KDC_PROFILE}"
+  cat <<EOF >"${KRB5_KDC_PROFILE}"
 [kdcdefaults]
   kdc_listen = "${KRB5_KDC_PORT:-8888}"
   kdc_listen_tcp = "${KRB5_KDC_LISTEN:-8888}"
@@ -55,18 +55,18 @@ EOF
 fi
 
 if ! [ -f "${KRB5_DATA_DIR}/kadm5.acl" ]; then
-  echo "*/admin@${KRB5_REALM} *" > "${KRB5_DATA_DIR}/kadm5.acl"
+  echo "*/admin@${KRB5_REALM} *" >"${KRB5_DATA_DIR}/kadm5.acl"
 fi
 
 if ! [ -f "${KRB5_DATA_DIR}/principal" ]; then
   echo "Database not initialized"
   echo "Initializing now..."
-  if [ -z "${KRB5_KDC_MASTER_PASSWORD_FILE:-}" ];then
+  if [ -z "${KRB5_KDC_MASTER_PASSWORD_FILE:-}" ]; then
     KRB5_KDC_MASTER_PASSWORD_FILE="${KRB5_DATA_DIR}/master.pass"
     echo "WARNING: You have not defined a file in which to find the KDC Master password"
     echo "WARNING: One will be created for you and stored at ${KRB5_KDC_MASTER_PASSWORD_FILE}"
     echo "WARNING: You should copy the contents of that file to a secure secrets storage solution and delete it"
-    pwgen -cny 64 1 > "${KRB5_KDC_MASTER_PASSWORD_FILE}"
+    pwgen -cny 64 1 >"${KRB5_KDC_MASTER_PASSWORD_FILE}"
   fi
   cat "${KRB5_KDC_MASTER_PASSWORD_FILE}" "${KRB5_KDC_MASTER_PASSWORD_FILE}" | kdb5_util create -r "${KRB5_REALM}" -s
   echo "Database initialized"
@@ -85,12 +85,12 @@ elif [ "${1}" = "kadmind" ]; then
 fi
 
 case "${command:-}" in
-  krb5kdc)
-    set -- /usr/sbin/krb5kdc -n
-    ;;
-  kadmind)
-    set -- /usr/sbin/kadmin -nofork
-    ;;
+krb5kdc)
+  set -- /usr/sbin/krb5kdc -n
+  ;;
+kadmind)
+  set -- /usr/sbin/kadmind -nofork
+  ;;
 esac
 
 exec "$@"
