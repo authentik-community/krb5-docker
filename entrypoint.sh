@@ -28,7 +28,7 @@ if [ -z "$(cat "${KRB5_KDC_PROFILE}")" ]; then
   cat <<EOF >"${KRB5_KDC_PROFILE}"
 [kdcdefaults]
   kdc_listen = "${KRB5_KDC_PORT:-8888}"
-  kdc_listen_tcp = "${KRB5_KDC_LISTEN:-8888}"
+  kdc_listen_tcp = "${KRB5_KDC_PORT:-8888}"
 
 [realms]
   ${KRB5_REALM} = {
