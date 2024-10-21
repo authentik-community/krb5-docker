@@ -31,7 +31,6 @@ jobs:
           push: true
           tags: |
             ghcr.io/authentik-community/krb5:${{ steps.ev.outputs.version }}
-            ghcr.io/authentik-community/krb5:latest
           platforms: linux/amd64,linux/arm64
           build-args: |
             GIT_BUILD_HASH=${{ steps.ev.outputs.sha }}
