@@ -46,7 +46,7 @@ jobs:
           else
             echo "sha=${{ github.event.pull_request.head.sha }}" > "${GITHUB_OUTPUT}"
           fi
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v6
         with:
           context: .
           push: "${{ github.ref == 'refs/heads/main' }}"
