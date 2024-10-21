@@ -1,6 +1,6 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
 
-set -xeuo pipefail
+set -euo pipefail
 
 if [ -z "$(cat "${KRB5_CONFIG}")" ]; then
   cat <<EOF >"${KRB5_CONFIG}"
@@ -16,19 +16,19 @@ if [ -z "$(cat "${KRB5_CONFIG}")" ]; then
   ${KRB5_REALM} = {
 EOF
   if [ -n "${KRB5_KDC:-}" ]; then
-    echo "    kdc = ${KRB5_KDC}" >>/etc/krb5.conf
+    echo "    kdc = ${KRB5_KDC}" >>"${KRB5_CONFIG}"
   fi
   if [ -n "${KRB5_ADMINSERVER:-}" ]; then
-    echo "    admin_server = ${KRB5_ADMINSERVER}" >>/etc/krb5.conf
+    echo "    admin_server = ${KRB5_ADMINSERVER}" >>"${KRB5_CONFIG}"
   fi
-  echo "  }" >>/etc/krb5.conf
+  echo "  }" >>"${KRB5_CONFIG}"
 fi
 
 if [ -z "$(cat "${KRB5_KDC_PROFILE}")" ]; then
   cat <<EOF >"${KRB5_KDC_PROFILE}"
 [kdcdefaults]
   kdc_listen = "${KRB5_KDC_PORT:-8888}"
-  kdc_listen_tcp = "${KRB5_KDC_PORT:-8888}"
+  kdc_tcp_listen = "${KRB5_KDC_PORT:-8888}"
 
 [realms]
   ${KRB5_REALM} = {
@@ -37,7 +37,7 @@ if [ -z "$(cat "${KRB5_KDC_PROFILE}")" ]; then
     key_stash_file = ${KRB5_DATA_DIR}/stash
     max_life = 24h 0m 0s
     kdc_listen = "${KRB5_KDC_PORT:-8888}"
-    kdc_listen_tcp = "${KRB5_KDC_PORT:-8888}"
+    kdc_tcp_listen = "${KRB5_KDC_PORT:-8888}"
     kpasswd_listen = "${KRB5_KPASSWD_PORT:-8464}"
     kadmind_listen = "${KRB5_KADMIN_PORT:-8749}"
     max_renewable_life = 2d 0h 0m 0s
@@ -71,26 +71,3 @@ if ! [ -f "${KRB5_DATA_DIR}/principal" ]; then
   cat "${KRB5_KDC_MASTER_PASSWORD_FILE}" "${KRB5_KDC_MASTER_PASSWORD_FILE}" | kdb5_util create -r "${KRB5_REALM}" -s
   echo "Database initialized"
 fi
-
-if [ -n "${INIT_ONLY:-}" ]; then
-  exit 0
-fi
-
-if [ "$#" -eq 0 ]; then
-  command="krb5kdc"
-elif [ "${1}" = "kdc" ] || [ "${1}" = "krb5kdc" ]; then
-  command="krb5kdc"
-elif [ "${1}" = "kadmind" ]; then
-  command="kadmind"
-fi
-
-case "${command:-}" in
-krb5kdc)
-  set -- /usr/sbin/krb5kdc -n
-  ;;
-kadmind)
-  set -- /usr/sbin/kadmind -nofork
-  ;;
-esac
-
-exec "$@"
