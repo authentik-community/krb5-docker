@@ -25,7 +25,7 @@ jobs:
       - id: ev
         run: |
           echo "version=${GITHUB_REF#refs/tags/version/}" > "${GITHUB_OUTPUT}"
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v6
         with:
           context: .
           push: true
