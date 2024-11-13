@@ -1,4 +1,4 @@
-FROM debian:12.7
+FROM debian:12.8
 
 ARG GIT_BUILD_HASH
 ARG VERSION
